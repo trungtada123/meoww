@@ -5,10 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}🐱 Cat Blog - Nơi chia sẻ những khoảnh khắc đáng yêu của mèo{% endblock %}</title>
     
-    <!-- Google Fonts -->
+    <!-- Enhanced Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Performance optimizations -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="color-scheme" content="light">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Enhanced SEO -->
+    <meta name="description" content="{% block description %}Chia sẻ những khoảnh khắc đáng yêu của mèo cùng cộng đồng yêu mèo. Blog về mèo với giao diện đẹp và hiện đại.{% endblock %}">
+    <meta name="keywords" content="mèo, cat, blog, pet, động vật, cute, dễ thương">
+    <meta name="author" content="Cat Blog">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.jpg', _external=True) }}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ self.description() }}{% endblock %}"
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,6 +51,13 @@
                 <a href="{{ url_for('index') }}" class="logo">
                     🐱 Cat Blog
                 </a>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" style="display: none;">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 
                 <ul class="nav-links">
                     <li><a href="{{ url_for('index') }}">🏠 Trang chủ</a></li>

@@ -79,8 +79,9 @@
                                 Đọc thêm 📖
                             </a>
                             {% if session.user_id %}
-                                <button class="like-btn" data-post-id="{{ post.id }}" style="flex: 0 0 auto;">
-                                    {% if session.user_id in [like.user_id for like in post.likes] %}
+                                {% set is_liked = post.id in liked_post_ids %}
+                                <button class="like-btn{% if is_liked %} liked{% endif %}" data-post-id="{{ post.id }}" style="flex: 0 0 auto;">
+                                    {% if is_liked %}
                                         ❤️ <span class="like-count">{{ post.likes|length }}</span>
                                     {% else %}
                                         🤍 <span class="like-count">{{ post.likes|length }}</span>
@@ -156,27 +157,23 @@
 {% if posts.items %}
     <section style="margin-top: 3rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--shadow-medium);">
         <h2 style="text-align: center; font-size: 1.5rem; margin-bottom: 2rem; color: var(--dark-color);">
-            📊 Thống kê danh mục
+            📊 Thống kê danh mục (trang này)
         </h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
             <div>
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
-                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">{{ posts.total }} bài viết</h3>
-                <p style="color: #666;">Tổng số bài viết</p>
+                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">{{ posts.items|length }} bài viết</h3>
+                <p style="color: #666;">Trong trang hiện tại</p>
             </div>
             <div>
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❤️</div>
-                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">
-                    {{ posts.items|sum(attribute='likes|length') }} lượt thích
-                </h3>
-                <p style="color: #666;">Tổng lượt thích</p>
+                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">{{ page_likes }} lượt thích</h3>
+                <p style="color: #666;">Trong trang hiện tại</p>
             </div>
             <div>
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💬</div>
-                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">
-                    {{ posts.items|sum(attribute='comments|length') }} bình luận
-                </h3>
-                <p style="color: #666;">Tổng bình luận</p>
+                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">{{ page_comments }} bình luận</h3>
+                <p style="color: #666;">Trong trang hiện tại</p>
             </div>
         </div>
     </section>

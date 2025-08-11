@@ -23,7 +23,13 @@
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <div class="post-author">
-                <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="Avatar" class="author-avatar">
+                {% if post.author.avatar and post.author.avatar != 'default-avatar.jpg' %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + post.author.avatar) }}" alt="Avatar" class="author-avatar">
+                {% else %}
+                    <div class="author-avatar" style="background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600;">
+                        {{ post.author.username[0].upper() }}
+                    </div>
+                {% endif %}
                 <span style="font-weight: 600; color: var(--dark-color);">{{ post.author.username }}</span>
             </div>
             <span style="color: #888; font-size: 0.9rem;">{{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
@@ -33,8 +39,8 @@
             <span style="color: #666;">❤️ {{ post.likes|length }} lượt thích</span>
             <span style="color: #666;">💬 {{ post.comments|length }} bình luận</span>
             {% if session.user_id %}
-                <button class="like-btn" data-post-id="{{ post.id }}">
-                    {% if session.user_id in [like.user_id for like in post.likes] %}
+                <button class="like-btn{% if liked_by_me %} liked{% endif %}" data-post-id="{{ post.id }}">
+                    {% if liked_by_me %}
                         ❤️ <span class="like-count">{{ post.likes|length }}</span>
                     {% else %}
                         🤍 <span class="like-count">{{ post.likes|length }}</span>
@@ -84,7 +90,13 @@
                 <div class="comment">
                     <div class="comment-header">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="Avatar" class="author-avatar">
+                            {% if comment.author.avatar and comment.author.avatar != 'default-avatar.jpg' %}
+                                <img src="{{ url_for('static', filename='uploads/avatars/' + comment.author.avatar) }}" alt="Avatar" class="author-avatar">
+                            {% else %}
+                                <div class="author-avatar" style="background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600;">
+                                    {{ comment.author.username[0].upper() }}
+                                </div>
+                            {% endif %}
                             <span class="comment-author">{{ comment.author.username }}</span>
                         </div>
                         <span class="comment-date">{{ comment.created_at.strftime('%d/%m/%Y %H:%M') }}</span>

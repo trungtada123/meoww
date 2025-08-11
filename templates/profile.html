@@ -5,8 +5,24 @@
 {% block content %}
 <!-- Profile Header -->
 <section style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: var(--border-radius); padding: 3rem 2rem; box-shadow: var(--shadow-medium); margin-bottom: 3rem; text-align: center;">
-    <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; font-size: 3rem;">
-        👤
+    <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 2rem;">
+        {% if user.avatar and user.avatar != 'default-avatar.jpg' %}
+            <img src="{{ url_for('static', filename='uploads/avatars/' + user.avatar) }}" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,0.3); box-shadow: var(--shadow-medium);">
+        {% else %}
+            <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 4px solid rgba(255,255,255,0.3);">
+                👤
+            </div>
+        {% endif %}
+        
+        <!-- Avatar Upload Button -->
+        <div style="position: absolute; bottom: 0; right: 0; background: var(--gradient-primary); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-medium);" onclick="document.getElementById('avatar-upload').click();">
+            <i class="fas fa-camera" style="color: white; font-size: 0.9rem;"></i>
+        </div>
+        
+        <!-- Hidden File Input -->
+        <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data" style="display: none;">
+            <input type="file" id="avatar-upload" name="avatar" accept="image/*" onchange="uploadAvatar()">
+        </form>
     </div>
     
     <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--dark-color);">{{ user.username }}</h1>
@@ -19,13 +35,13 @@
         </div>
         <div style="text-align: center;">
             <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-color);">
-                {{ posts|sum(attribute='likes|length') }}
+                {{ total_likes }}
             </div>
             <div style="color: #666;">Lượt thích nhận được</div>
         </div>
         <div style="text-align: center;">
             <div style="font-size: 2rem; font-weight: 700; color: var(--accent-color);">
-                {{ posts|sum(attribute='comments|length') }}
+                {{ total_comments }}
             </div>
             <div style="color: #666;">Bình luận nhận được</div>
         </div>
@@ -83,13 +99,16 @@
                             <a href="{{ url_for('post_detail', post_id=post.id) }}" class="btn btn-primary" style="flex: 1; text-align: center;">
                                 Đọc thêm 📖
                             </a>
-                            <button class="like-btn" data-post-id="{{ post.id }}" style="flex: 0 0 auto;">
-                                {% if session.user_id in [like.user_id for like in post.likes] %}
-                                    ❤️ <span class="like-count">{{ post.likes|length }}</span>
-                                {% else %}
-                                    🤍 <span class="like-count">{{ post.likes|length }}</span>
-                                {% endif %}
-                            </button>
+                            {% if session.user_id %}
+                                {% set is_liked = post.id in liked_post_ids %}
+                                <button class="like-btn{% if is_liked %} liked{% endif %}" data-post-id="{{ post.id }}" style="flex: 0 0 auto;">
+                                    {% if is_liked %}
+                                        ❤️ <span class="like-count">{{ post.likes|length }}</span>
+                                    {% else %}
+                                        🤍 <span class="like-count">{{ post.likes|length }}</span>
+                                    {% endif %}
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                 </article>
@@ -123,23 +142,16 @@
             <div>
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❤️</div>
                 <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">
-                    {{ posts|sum(attribute='likes|length') }} lượt thích
+                    {{ total_likes }} lượt thích
                 </h3>
                 <p style="color: #666;">Nhận được</p>
             </div>
             <div>
                 <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💬</div>
                 <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">
-                    {{ posts|sum(attribute='comments|length') }} bình luận
+                    {{ total_comments }} bình luận
                 </h3>
                 <p style="color: #666;">Nhận được</p>
-            </div>
-            <div>
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📅</div>
-                <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">
-                    {{ ((posts|max(attribute='created_at') - posts|min(attribute='created_at')).days + 1) if posts|length > 1 else 1 }} ngày
-                </h3>
-                <p style="color: #666;">Hoạt động</p>
             </div>
         </div>
     </section>
@@ -152,29 +164,24 @@
             📊 Phân bố danh mục
         </h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-            {% set categories = {'cute': 0, 'funny': 0, 'care': 0, 'tips': 0, 'stories': 0, 'general': 0} %}
-            {% for post in posts %}
-                {% set _ = categories.update({post.category: categories[post.category] + 1}) %}
-            {% endfor %}
-            
-            {% for category, count in categories.items() %}
+            {% for category_name, count in category_counts.items() %}
                 {% if count > 0 %}
                     <div style="text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.5); border-radius: var(--border-radius);">
                         <div style="font-size: 2rem; margin-bottom: 0.5rem;">
-                            {% if category == 'cute' %}😸
-                            {% elif category == 'funny' %}😹
-                            {% elif category == 'care' %}💕
-                            {% elif category == 'tips' %}💡
-                            {% elif category == 'stories' %}📖
+                            {% if category_name == 'cute' %}😸
+                            {% elif category_name == 'funny' %}😹
+                            {% elif category_name == 'care' %}💕
+                            {% elif category_name == 'tips' %}💡
+                            {% elif category_name == 'stories' %}📖
                             {% else %}📝{% endif %}
                         </div>
                         <div style="font-weight: 600; color: var(--dark-color);">{{ count }}</div>
                         <div style="font-size: 0.9rem; color: #666;">
-                            {% if category == 'cute' %}Dễ thương
-                            {% elif category == 'funny' %}Hài hước
-                            {% elif category == 'care' %}Chăm sóc
-                            {% elif category == 'tips' %}Mẹo hay
-                            {% elif category == 'stories' %}Câu chuyện
+                            {% if category_name == 'cute' %}Dễ thương
+                            {% elif category_name == 'funny' %}Hài hước
+                            {% elif category_name == 'care' %}Chăm sóc
+                            {% elif category_name == 'tips' %}Mẹo hay
+                            {% elif category_name == 'stories' %}Câu chuyện
                             {% else %}Khác{% endif %}
                         </div>
                     </div>
@@ -183,4 +190,40 @@
         </div>
     </section>
 {% endif %}
+
+<script>
+function uploadAvatar() {
+    const form = document.getElementById('avatar-form');
+    const fileInput = document.getElementById('avatar-upload');
+    
+    if (fileInput.files[0]) {
+        // Show loading indicator
+        const uploadBtn = document.querySelector('[onclick="document.getElementById(\'avatar-upload\').click();"]');
+        uploadBtn.innerHTML = '<div class="loading" style="border-color: white white white transparent;"></div>';
+        
+        // Submit form
+        const formData = new FormData(form);
+        
+        fetch('/profile/avatar', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload page to show new avatar
+                window.location.reload();
+            } else {
+                alert(data.error || 'Lỗi khi upload avatar!');
+                uploadBtn.innerHTML = '<i class="fas fa-camera" style="color: white; font-size: 0.9rem;"></i>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi upload avatar!');
+            uploadBtn.innerHTML = '<i class="fas fa-camera" style="color: white; font-size: 0.9rem;"></i>';
+        });
+    }
+}
+</script>
 {% endblock %} 

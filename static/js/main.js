@@ -1,41 +1,166 @@
-// Main JavaScript for Cat Blog
+// Enhanced Cat Blog JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
-    initAnimations();
-    initLikeButtons();
+    // Initialize all enhanced components
+    initAdvancedAnimations();
+    initEnhancedLikeButtons();
+    initMagicCursor();
+    initParticleEffects();
     initFlashMessages();
     initFormValidation();
     initParallaxEffects();
     initCatPaws();
+    initScrollEffects();
+    initInteractiveCards();
+    initTypingEffect();
+    initMobileMenu();
 });
 
-// Smooth animations on scroll
-function initAnimations() {
+// Mobile menu functionality
+function initMobileMenu() {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (mobileMenuBtn && navLinks) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenuBtn.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close menu when clicking on a link
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenuBtn.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenuBtn.contains(e.target) && !navLinks.contains(e.target)) {
+                mobileMenuBtn.classList.remove('active');
+                navLinks.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Advanced animations with stagger effect
+function initAdvancedAnimations() {
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0) rotateX(0)';
+                    entry.target.classList.add('animate-in');
+                }, index * 100); // Stagger effect
             }
         });
     }, observerOptions);
 
-    // Observe all cards and sections
-    document.querySelectorAll('.post-card, .form-container, .post-detail').forEach(el => {
+    // Observe all cards and sections with enhanced effects
+    document.querySelectorAll('.post-card, .form-container, .post-detail').forEach((el, index) => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.transform = 'translateY(50px) rotateX(10deg)';
+        el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
         observer.observe(el);
+        
+        // Add random delay for more organic feel
+        el.style.transitionDelay = `${Math.random() * 0.3}s`;
     });
 }
 
-// Like button functionality
-function initLikeButtons() {
+// Magic cursor effect
+function initMagicCursor() {
+    const cursor = document.createElement('div');
+    cursor.className = 'magic-cursor';
+    document.body.appendChild(cursor);
+    
+    const cursorFollower = document.createElement('div');
+    cursorFollower.className = 'cursor-follower';
+    document.body.appendChild(cursorFollower);
+    
+    let mouseX = 0, mouseY = 0;
+    let followerX = 0, followerY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        cursor.style.transform = `translate(${mouseX - 10}px, ${mouseY - 10}px)`;
+    });
+    
+    // Smooth follower animation
+    function animateFollower() {
+        followerX += (mouseX - followerX) * 0.1;
+        followerY += (mouseY - followerY) * 0.1;
+        
+        cursorFollower.style.transform = `translate(${followerX - 20}px, ${followerY - 20}px)`;
+        requestAnimationFrame(animateFollower);
+    }
+    animateFollower();
+    
+    // Interactive elements
+    document.querySelectorAll('a, button, .post-card').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            cursor.classList.add('cursor-hover');
+            cursorFollower.classList.add('cursor-hover');
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            cursor.classList.remove('cursor-hover');
+            cursorFollower.classList.remove('cursor-hover');
+        });
+    });
+}
+
+// Particle effects on interaction
+function initParticleEffects() {
+    function createParticle(x, y, color = '#667eea') {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            width: 6px;
+            height: 6px;
+            background: ${color};
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            animation: particleFloat 1s ease-out forwards;
+        `;
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => particle.remove(), 1000);
+    }
+    
+    // Create particles on button clicks
+    document.addEventListener('click', (e) => {
+        if (e.target.matches('button, .btn, .like-btn')) {
+            const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b'];
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => {
+                    createParticle(
+                        e.clientX + (Math.random() - 0.5) * 100,
+                        e.clientY + (Math.random() - 0.5) * 100,
+                        colors[Math.floor(Math.random() * colors.length)]
+                    );
+                }, i * 50);
+            }
+        }
+    });
+}
+
+// Enhanced like button functionality
+function initEnhancedLikeButtons() {
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -71,19 +196,44 @@ function initLikeButtons() {
                     button.innerHTML = `🤍 <span class="like-count">${data.count}</span>`;
                 }
                 
-                // Add heart animation
-                const heart = document.createElement('div');
-                heart.innerHTML = '❤️';
-                heart.style.cssText = `
-                    position: absolute;
-                    font-size: 20px;
-                    pointer-events: none;
-                    animation: heartFloat 1s ease-out forwards;
-                    z-index: 1000;
-                `;
-                button.appendChild(heart);
+                // Enhanced heart animation with multiple hearts
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.innerHTML = '❤️';
+                        heart.style.cssText = `
+                            position: absolute;
+                            font-size: ${15 + Math.random() * 10}px;
+                            pointer-events: none;
+                            animation: heartFloat 2s ease-out forwards;
+                            z-index: 1000;
+                            left: ${Math.random() * 20 - 10}px;
+                            top: ${Math.random() * 20 - 10}px;
+                            filter: hue-rotate(${Math.random() * 60}deg);
+                        `;
+                        button.appendChild(heart);
+                        
+                        setTimeout(() => heart.remove(), 2000);
+                    }, i * 200);
+                }
                 
-                setTimeout(() => heart.remove(), 1000);
+                // Add ripple effect
+                const ripple = document.createElement('div');
+                ripple.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 0;
+                    height: 0;
+                    background: radial-gradient(circle, rgba(255,107,107,0.4) 0%, transparent 70%);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    animation: rippleEffect 0.6s ease-out forwards;
+                    pointer-events: none;
+                    z-index: 1;
+                `;
+                button.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -334,6 +484,187 @@ document.head.appendChild(style);
 // Initialize image preview when DOM is loaded
 document.addEventListener('DOMContentLoaded', initImagePreview);
 
+// Refined scroll effects
+function initScrollEffects() {
+    let ticking = false;
+    
+    function updateScrollEffects() {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.2; // Reduced parallax intensity
+        
+        // Subtle parallax background
+        document.body.style.backgroundPositionY = `${rate}px`;
+        
+        // Gentle header opacity change
+        const header = document.querySelector('.header');
+        if (header) {
+            const opacity = Math.min(0.12 + (scrolled / 1000) * 0.08, 0.2); // Very subtle change
+            header.style.background = `rgba(255, 255, 255, ${opacity})`;
+        }
+        
+        ticking = false;
+    }
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(updateScrollEffects);
+            ticking = true;
+        }
+    });
+}
+
+// Subtle card interactions (disabled tilt for better UX)
+function initInteractiveCards() {
+    // Disabled tilt effect as it was causing discomfort
+    // Cards now use simple hover effects defined in CSS
+}
+
+// Typing effect for hero text
+function initTypingEffect() {
+    const heroText = document.querySelector('.hero h1');
+    if (!heroText) return;
+    
+    const text = heroText.textContent;
+    heroText.textContent = '';
+    heroText.style.borderRight = '2px solid rgba(255,255,255,0.8)';
+    
+    let i = 0;
+    function typeWriter() {
+        if (i < text.length) {
+            heroText.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeWriter, 100);
+        } else {
+            // Remove cursor after typing
+            setTimeout(() => {
+                heroText.style.borderRight = 'none';
+            }, 1000);
+        }
+    }
+    
+    // Start typing after a delay
+    setTimeout(typeWriter, 500);
+}
+
+// Enhanced CSS animations via JavaScript
+const enhancedAnimations = `
+    .magic-cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: rgba(102, 126, 234, 0.8);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transition: transform 0.1s ease, background 0.2s ease;
+        mix-blend-mode: difference;
+    }
+    
+    .cursor-follower {
+        position: fixed;
+        width: 40px;
+        height: 40px;
+        background: rgba(240, 147, 251, 0.3);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        transition: transform 0.2s ease;
+        backdrop-filter: blur(5px);
+    }
+    
+    .cursor-hover {
+        transform: scale(1.5) !important;
+        background: rgba(245, 87, 108, 0.8) !important;
+    }
+    
+    @keyframes particleFloat {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-100px) scale(0);
+        }
+    }
+    
+    @keyframes rippleEffect {
+        0% {
+            width: 0;
+            height: 0;
+            opacity: 1;
+        }
+        100% {
+            width: 100px;
+            height: 100px;
+            opacity: 0;
+        }
+    }
+    
+    @keyframes heartFloat {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotate(0deg);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-60px) scale(1.5) rotate(20deg);
+        }
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .post-card {
+        transform-style: preserve-3d;
+        will-change: transform;
+    }
+    
+    .form-container {
+        will-change: transform;
+    }
+    
+    /* Enhanced glassmorphism effects */
+    .post-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, 
+            rgba(255,255,255,0.1) 0%, 
+            transparent 50%, 
+            rgba(255,255,255,0.05) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .post-card:hover::after {
+        opacity: 1;
+    }
+`;
+
+// Inject enhanced styles
+const styleSheet = document.createElement('style');
+styleSheet.textContent = enhancedAnimations;
+document.head.appendChild(styleSheet);
+
 // Add some fun cat-themed console messages
-console.log('🐱 Welcome to the Cat Blog! 🐱');
-console.log('Meow! The blog is ready to serve you with purr-fect content! 😸'); 
+console.log('🐱 Welcome to the Enhanced Cat Blog! 🐱');
+console.log('Meow! The blog is ready to serve you with purr-fect enhanced content! 😸');
+console.log('✨ New features: Magic cursor, particle effects, enhanced animations! ✨'); 

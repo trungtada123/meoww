@@ -52,49 +52,13 @@ python app.py
 
 ### Sử dụng Render (Miễn phí)
 
-1. **Tạo tài khoản Render**: Đăng ký tại [render.com](https://render.com)
+1. Đăng ký tại [render.com](https://render.com)
+2. Đảm bảo `requirements.txt` KHÔNG cần `greenlet` (Flask + SQLAlchemy vẫn hoạt động mà không cần greenlet). Nếu bạn gặp lỗi build `greenlet` trên Python 3.13, hãy xóa dòng `greenlet==...` khỏi `requirements.txt`.
+3. Sử dụng file `render.yaml` đã kèm, Render sẽ tự set biến `PORT`. Gunicorn sẽ đọc biến này khi khởi chạy.
+4. Khuyến nghị đặt `PYTHON_VERSION` là 3.11 trên Render để tương thích cao nhất.
 
-2. **Tạo file `render.yaml`**:
-```yaml
-services:
-  - type: web
-    name: cat-blog
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.9.0
-```
-
-3. **Tạo file `gunicorn.conf.py`**:
-```python
-bind = "0.0.0.0:10000"
-workers = 2
-timeout = 120
-```
-
-4. **Cập nhật requirements.txt**:
-```
-Flask==2.3.3
-Flask-SQLAlchemy==3.0.5
-Werkzeug==2.3.7
-Jinja2==3.1.2
-MarkupSafe==2.1.3
-itsdangerous==2.1.2
-click==8.1.7
-blinker==1.6.3
-SQLAlchemy==2.0.21
-typing_extensions==4.7.1
-greenlet==2.0.2
-gunicorn==21.2.0
-```
-
-5. **Deploy lên Render**:
-   - Kết nối GitHub repository với Render
-   - Chọn "New Web Service"
-   - Chọn repository và branch
-   - Render sẽ tự động build và deploy
+### Sử dụng Railway/Heroku
+- Tương tự, đảm bảo `gunicorn` có trong `requirements.txt` và app được start bằng `gunicorn app:app`.
 
 ### Sử dụng Railway (Miễn phí)
 
