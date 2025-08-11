@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Cat Blog{% endblock %}
+
+{% block content %}
+<!-- Post Detail -->
+<article class="post-detail">
+    {% if post.image %}
+        <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}" class="post-detail-image">
+    {% endif %}
+    
+    <header style="margin-bottom: 2rem;">
+        <span class="post-category">
+            {% if post.category == 'cute' %}😸 Dễ thương
+            {% elif post.category == 'funny' %}😹 Hài hước
+            {% elif post.category == 'care' %}💕 Chăm sóc
+            {% elif post.category == 'tips' %}💡 Mẹo hay
+            {% elif post.category == 'stories' %}📖 Câu chuyện
+            {% else %}📝 Khác{% endif %}
+        </span>
+        
+        <h1 class="post-detail-title">{{ post.title }}</h1>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div class="post-author">
+                <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="Avatar" class="author-avatar">
+                <span style="font-weight: 600; color: var(--dark-color);">{{ post.author.username }}</span>
+            </div>
+            <span style="color: #888; font-size: 0.9rem;">{{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <span style="color: #666;">❤️ {{ post.likes|length }} lượt thích</span>
+            <span style="color: #666;">💬 {{ post.comments|length }} bình luận</span>
+            {% if session.user_id %}
+                <button class="like-btn" data-post-id="{{ post.id }}">
+                    {% if session.user_id in [like.user_id for like in post.likes] %}
+                        ❤️ <span class="like-count">{{ post.likes|length }}</span>
+                    {% else %}
+                        🤍 <span class="like-count">{{ post.likes|length }}</span>
+                    {% endif %}
+                </button>
+            {% endif %}
+        </div>
+    </header>
+    
+    <div class="post-detail-content">
+        {{ post.content|nl2br }}
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">← Quay lại trang chủ</a>
+        {% if session.user_id == post.user_id %}
+            <a href="#" class="btn btn-secondary" style="margin-left: 1rem;">✏️ Chỉnh sửa</a>
+        {% endif %}
+    </div>
+</article>
+
+<!-- Comments Section -->
+<section class="comments-section">
+    <h2 style="margin-bottom: 2rem; font-size: 1.5rem; color: var(--dark-color);">💬 Bình luận ({{ post.comments|length }})</h2>
+    
+    {% if session.user_id %}
+        <!-- Comment Form -->
+        <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}" style="margin-bottom: 2rem;">
+            <div class="form-group">
+                <label for="content" class="form-label">Viết bình luận của bạn:</label>
+                <textarea id="content" name="content" class="form-input form-textarea" required 
+                          placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Gửi bình luận 💬</button>
+        </form>
+    {% else %}
+        <div style="text-align: center; padding: 2rem; background: rgba(255, 255, 255, 0.5); border-radius: var(--border-radius); margin-bottom: 2rem;">
+            <p style="color: #666; margin-bottom: 1rem;">Đăng nhập để bình luận!</p>
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Đăng nhập ngay 🔑</a>
+        </div>
+    {% endif %}
+    
+    <!-- Comments List -->
+    {% if post.comments %}
+        <div style="margin-top: 2rem;">
+            {% for comment in post.comments %}
+                <div class="comment">
+                    <div class="comment-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="Avatar" class="author-avatar">
+                            <span class="comment-author">{{ comment.author.username }}</span>
+                        </div>
+                        <span class="comment-date">{{ comment.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                    </div>
+                    <div class="comment-content">
+                        {{ comment.content }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem 2rem; color: #666;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">💭</div>
+            <p>Chưa có bình luận nào. Hãy là người đầu tiên bình luận! 😸</p>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Related Posts -->
+{% if post.category != 'general' %}
+    <section style="margin-top: 3rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--shadow-medium);">
+        <h2 style="margin-bottom: 2rem; font-size: 1.5rem; color: var(--dark-color);">📖 Bài viết liên quan</h2>
+        <p style="color: #666; margin-bottom: 2rem;">Khám phá thêm những bài viết thú vị khác trong cùng danh mục!</p>
+        <a href="{{ url_for('category', category=post.category) }}" class="btn btn-primary">Xem tất cả bài viết {{ post.category }} 📚</a>
+    </section>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Convert newlines to <br> tags for content display
+    document.addEventListener('DOMContentLoaded', function() {
+        const contentElement = document.querySelector('.post-detail-content');
+        if (contentElement) {
+            contentElement.innerHTML = contentElement.textContent.replace(/\n/g, '<br>');
+        }
+    });
+</script>
+{% endblock %} 

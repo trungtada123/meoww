@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}🐱 Đăng nhập - Cat Blog{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1 class="form-title">🐱 Đăng nhập</h1>
+    
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+            <label for="username" class="form-label">👤 Tên người dùng</label>
+            <input type="text" id="username" name="username" class="form-input" required 
+                   placeholder="Nhập tên người dùng của bạn">
+        </div>
+        
+        <div class="form-group">
+            <label for="password" class="form-label">🔒 Mật khẩu</label>
+            <input type="password" id="password" name="password" class="form-input" required 
+                   placeholder="Nhập mật khẩu của bạn">
+        </div>
+        
+        <button type="submit" class="submit-btn">Đăng nhập! 🚀</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+        <p style="color: #666; margin-bottom: 1rem;">Chưa có tài khoản?</p>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary">Đăng ký ngay! 📝</a>
+    </div>
+    
+    <!-- Fun cat illustration -->
+    <div style="text-align: center; margin-top: 2rem; opacity: 0.7;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">😸</div>
+        <p style="color: #666; font-size: 0.9rem;">Chào mừng bạn trở lại! 🐱</p>
+    </div>
+</div>
+{% endblock %} 

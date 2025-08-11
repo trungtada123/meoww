@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}🐱 Đăng ký - Cat Blog{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1 class="form-title">🐱 Đăng ký tài khoản</h1>
+    
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+            <label for="username" class="form-label">👤 Tên người dùng</label>
+            <input type="text" id="username" name="username" class="form-input" required 
+                   placeholder="Nhập tên người dùng của bạn">
+        </div>
+        
+        <div class="form-group">
+            <label for="email" class="form-label">📧 Email</label>
+            <input type="email" id="email" name="email" class="form-input" required 
+                   placeholder="Nhập email của bạn">
+        </div>
+        
+        <div class="form-group">
+            <label for="password" class="form-label">🔒 Mật khẩu</label>
+            <input type="password" id="password" name="password" class="form-input" required 
+                   placeholder="Nhập mật khẩu (ít nhất 6 ký tự)">
+        </div>
+        
+        <button type="submit" class="submit-btn">Đăng ký ngay! 🎉</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+        <p style="color: #666; margin-bottom: 1rem;">Đã có tài khoản?</p>
+        <a href="{{ url_for('login') }}" class="btn btn-secondary">Đăng nhập ngay! 🔑</a>
+    </div>
+    
+    <!-- Fun cat illustration -->
+    <div style="text-align: center; margin-top: 2rem; opacity: 0.7;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🐱</div>
+        <p style="color: #666; font-size: 0.9rem;">Chào mừng bạn đến với cộng đồng yêu mèo! 😸</p>
+    </div>
+</div>
+{% endblock %} 

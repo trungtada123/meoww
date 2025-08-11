@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}🐱 Cat Blog - Trang chủ{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Chào mừng đến với Cat Blog! 🐱</h1>
+    <p>Nơi chia sẻ những khoảnh khắc đáng yêu, hài hước và ấm áp của những chú mèo dễ thương</p>
+    {% if not session.user_id %}
+        <a href="{{ url_for('register') }}" class="cta-button">Bắt đầu chia sẻ ngay! ✨</a>
+    {% else %}
+        <a href="{{ url_for('new_post') }}" class="cta-button">Viết bài mới! ✏️</a>
+    {% endif %}
+</section>
+
+<!-- Category Navigation -->
+<section style="margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">🏠 Tất cả</a>
+        <a href="{{ url_for('category', category='cute') }}" class="btn btn-secondary">😸 Dễ thương</a>
+        <a href="{{ url_for('category', category='funny') }}" class="btn btn-accent">😹 Hài hước</a>
+        <a href="{{ url_for('category', category='care') }}" class="btn btn-primary">💕 Chăm sóc</a>
+        <a href="{{ url_for('category', category='tips') }}" class="btn btn-secondary">💡 Mẹo hay</a>
+        <a href="{{ url_for('category', category='stories') }}" class="btn btn-accent">📖 Câu chuyện</a>
+    </div>
+</section>
+
+<!-- Posts Grid -->
+<section>
+    {% if posts.items %}
+        <div class="posts-grid">
+            {% for post in posts.items %}
+                <article class="post-card">
+                    {% if post.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="{{ post.title }}" class="post-image">
+                    {% else %}
+                        <div class="post-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                            🐱
+                        </div>
+                    {% endif %}
+                    
+                    <div class="post-content">
+                        <span class="post-category">
+                            {% if post.category == 'cute' %}😸 Dễ thương
+                            {% elif post.category == 'funny' %}😹 Hài hước
+                            {% elif post.category == 'care' %}💕 Chăm sóc
+                            {% elif post.category == 'tips' %}💡 Mẹo hay
+                            {% elif post.category == 'stories' %}📖 Câu chuyện
+                            {% else %}📝 Khác{% endif %}
+                        </span>
+                        
+                        <h2 class="post-title">
+                            <a href="{{ url_for('post_detail', post_id=post.id) }}" style="text-decoration: none; color: inherit;">
+                                {{ post.title }}
+                            </a>
+                        </h2>
+                        
+                        <p class="post-excerpt">
+                            {{ post.content[:150] }}{% if post.content|length > 150 %}...{% endif %}
+                        </p>
+                        
+                        <div class="post-meta">
+                            <div class="post-author">
+                                <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="Avatar" class="author-avatar">
+                                <span>{{ post.author.username }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span>❤️ {{ post.likes|length }}</span>
+                                <span>💬 {{ post.comments|length }}</span>
+                                <span style="font-size: 0.8rem;">{{ post.created_at.strftime('%d/%m/%Y') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <a href="{{ url_for('post_detail', post_id=post.id) }}" class="btn btn-primary" style="flex: 1; text-align: center;">
+                                Đọc thêm 📖
+                            </a>
+                            {% if session.user_id %}
+                                <button class="like-btn" data-post-id="{{ post.id }}" style="flex: 0 0 auto;">
+                                    {% if session.user_id in [like.user_id for like in post.likes] %}
+                                        ❤️ <span class="like-count">{{ post.likes|length }}</span>
+                                    {% else %}
+                                        🤍 <span class="like-count">{{ post.likes|length }}</span>
+                                    {% endif %}
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if posts.pages > 1 %}
+            <div class="pagination">
+                {% if posts.has_prev %}
+                    <a href="{{ url_for('index', page=posts.prev_num) }}">← Trước</a>
+                {% endif %}
+                
+                {% for page_num in posts.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                    {% if page_num %}
+                        {% if page_num == posts.page %}
+                            <span class="current">{{ page_num }}</span>
+                        {% else %}
+                            <a href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span>...</span>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                    <a href="{{ url_for('index', page=posts.next_num) }}">Sau →</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Empty State -->
+        <div style="text-align: center; padding: 4rem 2rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: var(--border-radius); box-shadow: var(--shadow-medium);">
+            <div style="font-size: 5rem; margin-bottom: 2rem;">🐱</div>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--dark-color);">Chưa có bài viết nào!</h2>
+            <p style="color: #666; margin-bottom: 2rem; font-size: 1.1rem;">
+                Hãy là người đầu tiên chia sẻ những khoảnh khắc đáng yêu của mèo nhé!
+            </p>
+            {% if session.user_id %}
+                <a href="{{ url_for('new_post') }}" class="cta-button">Viết bài đầu tiên! ✏️</a>
+            {% else %}
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{{ url_for('register') }}" class="cta-button">Đăng ký ngay! 📝</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">Đăng nhập 🔑</a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+
+<!-- Fun Cat Facts Section -->
+<section style="margin-top: 4rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--shadow-medium);">
+    <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        🐱 Sự thật thú vị về mèo 🐱
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">😴</div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">Ngủ nhiều</h3>
+            <p style="color: #666;">Mèo ngủ trung bình 12-16 giờ mỗi ngày!</p>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎵</div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">Tiếng kêu</h3>
+            <p style="color: #666;">Mèo có thể tạo ra hơn 100 âm thanh khác nhau!</p>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">👅</div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">Lưỡi gai</h3>
+            <p style="color: #666;">Lưỡi mèo có những gai nhỏ giúp chúng chải lông!</p>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">👁️</div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--dark-color);">Thị giác</h3>
+            <p style="color: #666;">Mèo có thể nhìn rõ trong bóng tối gấp 6 lần con người!</p>
+        </div>
+    </div>
+</section>
+{% endblock %} 

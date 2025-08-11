@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}🐱 Cat Blog - Nơi chia sẻ những khoảnh khắc đáng yêu của mèo{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo">
+                    🐱 Cat Blog
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">🏠 Trang chủ</a></li>
+                    <li><a href="{{ url_for('category', category='cute') }}">😸 Dễ thương</a></li>
+                    <li><a href="{{ url_for('category', category='funny') }}">😹 Hài hước</a></li>
+                    <li><a href="{{ url_for('category', category='care') }}">💕 Chăm sóc</a></li>
+                    {% if session.user_id %}
+                        <li><a href="{{ url_for('new_post') }}">✏️ Viết bài</a></li>
+                        <li><a href="{{ url_for('profile') }}">👤 {{ session.username }}</a></li>
+                        <li><a href="{{ url_for('logout') }}">🚪 Đăng xuất</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">🔑 Đăng nhập</a></li>
+                        <li><a href="{{ url_for('register') }}">📝 Đăng ký</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); padding: 2rem 0; margin-top: 4rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+        <div class="container">
+            <p style="color: #666; margin-bottom: 1rem;">
+                🐱 Made with ❤️ for cat lovers everywhere 🐱
+            </p>
+            <p style="color: #888; font-size: 0.9rem;">
+                © 2024 Cat Blog - Nơi chia sẻ những khoảnh khắc đáng yêu của mèo
+            </p>
+        </div>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html> 

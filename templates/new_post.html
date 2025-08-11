@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}🐱 Viết bài mới - Cat Blog{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px;">
+    <h1 class="form-title">✏️ Viết bài mới</h1>
+    
+    <form method="POST" action="{{ url_for('new_post') }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title" class="form-label">📝 Tiêu đề bài viết</label>
+            <input type="text" id="title" name="title" class="form-input" required 
+                   placeholder="Nhập tiêu đề bài viết của bạn">
+        </div>
+        
+        <div class="form-group">
+            <label for="category" class="form-label">🏷️ Danh mục</label>
+            <select id="category" name="category" class="form-input form-select" required>
+                <option value="">Chọn danh mục</option>
+                <option value="cute">😸 Dễ thương</option>
+                <option value="funny">😹 Hài hước</option>
+                <option value="care">💕 Chăm sóc</option>
+                <option value="tips">💡 Mẹo hay</option>
+                <option value="stories">📖 Câu chuyện</option>
+                <option value="general">📝 Khác</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="image" class="form-label">📸 Hình ảnh (tùy chọn)</label>
+            <input type="file" id="image" name="image" class="form-input" accept="image/*">
+            <small style="color: #666; font-size: 0.9rem;">Hỗ trợ: JPG, PNG, GIF (tối đa 16MB)</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="content" class="form-label">📖 Nội dung bài viết</label>
+            <textarea id="content" name="content" class="form-input form-textarea" required 
+                      placeholder="Chia sẻ câu chuyện, khoảnh khắc đáng yêu của mèo nhà bạn..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="submit-btn" style="flex: 1;">Đăng bài! 🚀</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary" style="flex: 0 0 auto;">Hủy bỏ</a>
+        </div>
+    </form>
+    
+    <!-- Writing tips -->
+    <div style="margin-top: 3rem; padding: 2rem; background: rgba(255, 255, 255, 0.5); border-radius: var(--border-radius); border-left: 4px solid var(--primary-color);">
+        <h3 style="margin-bottom: 1rem; color: var(--dark-color);">💡 Mẹo viết bài hay:</h3>
+        <ul style="color: #666; line-height: 1.8;">
+            <li>Chia sẻ những khoảnh khắc thật và tự nhiên của mèo</li>
+            <li>Thêm hình ảnh chất lượng cao để bài viết sinh động hơn</li>
+            <li>Viết nội dung có ý nghĩa và hữu ích cho cộng đồng</li>
+            <li>Sử dụng emoji để bài viết thêm vui nhộn 😸</li>
+            <li>Chọn danh mục phù hợp để người đọc dễ tìm thấy</li>
+        </ul>
+    </div>
+    
+    <!-- Fun cat illustration -->
+    <div style="text-align: center; margin-top: 2rem; opacity: 0.7;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">✍️</div>
+        <p style="color: #666; font-size: 0.9rem;">Hãy chia sẻ những khoảnh khắc đáng yêu của mèo nhà bạn! 🐱</p>
+    </div>
+</div>
+{% endblock %} 
